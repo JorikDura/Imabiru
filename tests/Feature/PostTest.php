@@ -58,6 +58,46 @@ describe('testing posts', function () {
             ->assertStatus(200);
     });
 
+
+    it("update post", function () {
+        $testResult = actingAs($this->user)
+            ->post(
+                uri: 'api/v1/posts',
+                data: [
+                    'title' => 'another test',
+                    'description' => 'testing another test!',
+                    'tags' => [
+                        'another_tag'
+                    ],
+                    'images' => [
+                        new UploadedFile(
+                            path: resource_path(path: 'test-files/test_file.jpg'),
+                            originalName: 'test_file.jpg',
+                            test: true
+                        )
+                    ]
+                ]
+            )->assertStatus(201);
+
+        actingAs($this->user)
+            ->postJson(
+                uri: "/api/v1/posts/{$testResult->original->id}",
+                data: [
+                    '_method' => 'PUT',
+                    'title' => 'test',
+                    'tags' => [
+                        'another_tag'
+                    ],
+                    'description' => 'still testing!'
+                ]
+            )->assertStatus(200);
+
+        //delete image from storage
+        actingAs($this->user)
+            ->delete("/api/v1/posts/{$testResult->original->id}")
+            ->assertStatus(200);
+    });
+
     it("try to update && delete someone else's post", function () {
         $testResult = actingAs($this->user)
             ->post(
@@ -95,5 +135,10 @@ describe('testing posts', function () {
         deleteJson(
             uri: "api/v1/posts/{$testResult->original->id}"
         )->assertStatus(403);
+
+        //delete image from storage
+        actingAs($this->user)
+            ->delete("/api/v1/posts/{$testResult->original->id}")
+            ->assertStatus(200);
     });
 });
