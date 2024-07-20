@@ -12,11 +12,10 @@ class UpdateUserPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'oldPassword' => ['bail', 'required_with:newPassword', 'nullable', 'string'],
+            'oldPassword' => ['bail', 'required', 'string', 'current_password:sanctum'],
             'newPassword' => [
                 'bail',
-                'required_with:password',
-                'nullable',
+                'required',
                 'string',
                 'confirmed',
                 Password::default()
