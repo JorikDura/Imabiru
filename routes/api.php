@@ -54,11 +54,13 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::group(['prefix' => 'posts'], function () {
-            Route::post('/', StorePostController::class);
+            Route::post('/', StorePostController::class)
+                ->middleware(['throttle:6,60']);
             Route::put('/{post}', UpdatePostController::class)
                 ->can('update', 'post');
             Route::delete('/{post}', DeletePostController::class)
-                ->can('delete', 'post');
+                ->can('delete', 'post')
+                ->middleware(['throttle:10,60']);
         });
     });
 });
