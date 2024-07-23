@@ -32,11 +32,7 @@ describe('testing posts', function () {
                         'test_tag'
                     ],
                     'images' => [
-                        new UploadedFile(
-                            path: resource_path(path: 'test-files/test_file.jpg'),
-                            originalName: 'test_file.jpg',
-                            test: true
-                        )
+                        getUploadedFile()
                     ]
                 ]
             )->assertStatus(201);
@@ -51,7 +47,8 @@ describe('testing posts', function () {
         );
 
         get("api/v1/posts/{$testResult->original->id}")
-            ->assertStatus(200);
+            ->assertStatus(200)
+            ->assertSee('test');
 
         actingAs($this->user)
             ->delete("/api/v1/posts/{$testResult->original->id}")
@@ -70,11 +67,7 @@ describe('testing posts', function () {
                         'another_tag'
                     ],
                     'images' => [
-                        new UploadedFile(
-                            path: resource_path(path: 'test-files/test_file.jpg'),
-                            originalName: 'test_file.jpg',
-                            test: true
-                        )
+                        getUploadedFile()
                     ]
                 ]
             )->assertStatus(201);
@@ -109,11 +102,7 @@ describe('testing posts', function () {
                         'test_tag'
                     ],
                     'images' => [
-                        new UploadedFile(
-                            path: resource_path(path: 'test-files/test_file.jpg'),
-                            originalName: 'test_file.jpg',
-                            test: true
-                        )
+                        getUploadedFile()
                     ]
                 ]
             )->assertStatus(201);
@@ -142,3 +131,15 @@ describe('testing posts', function () {
             ->assertStatus(200);
     });
 });
+
+/**
+ * @return UploadedFile
+ */
+function getUploadedFile(): UploadedFile
+{
+    return new UploadedFile(
+        path: resource_path(path: 'test-files/test_file.jpg'),
+        originalName: 'test_file.jpg',
+        test: true
+    );
+}

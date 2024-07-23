@@ -7,6 +7,7 @@ namespace App\Actions\Image;
 use App\Enums\ImagePath;
 use App\Models\Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image as ImageFacade;
 
 final readonly class UploadImageAction
@@ -24,8 +25,7 @@ final readonly class UploadImageAction
     ): Image {
         $image = ImageFacade::read($image);
 
-        $time = time();
-        $name .= "-$time";
+        $name .= '-'.time();
 
         $shouldScaleImage = $image->width() > self::MIN_IMAGE_HEIGHT;
 
@@ -38,15 +38,24 @@ final readonly class UploadImageAction
                 : null,
         ]);
 
-        $path = storage_path("app/public/$path->value");
+        /** @var UploadedFile $convertedOriginalImage */
+        $convertedOriginalImage = $image->toJpeg();
 
-        $image->toJpeg()
-            ->save("$path$name".self::FILE_EXTENSION);
+        Storage::disk(name: 'public')
+            ->put(
+                path: "$path->value$name".self::FILE_EXTENSION,
+                contents: $convertedOriginalImage
+            );
 
         if ($shouldScaleImage) {
-            $image->scale(height: self::MIN_IMAGE_HEIGHT)
-                ->toJpeg()
-                ->save("$path$name-scaled".self::FILE_EXTENSION);
+            /** @var UploadedFile $convertedScaledImage */
+            $convertedScaledImage = $image->scale(height: self::MIN_IMAGE_HEIGHT)->toJpeg();
+
+            Storage::disk(name: 'public')
+                ->put(
+                    path: "$path->value$name-scaled".self::FILE_EXTENSION,
+                    contents: $convertedScaledImage
+                );
         }
 
         return $dbImage;

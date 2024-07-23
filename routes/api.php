@@ -46,21 +46,26 @@ Route::group(['prefix' => 'v1'], function () {
         ]
     ], function () {
         Route::group(['prefix' => 'users'], function () {
-            Route::post('/upload-image', UploadUserImageController::class);
-            Route::delete('/delete-image', DeleteUserImageController::class);
-            Route::put('/update-password', UpdateUserPasswordController::class);
-            Route::put('/update-email', UpdateUserEmailController::class);
+            Route::post('/upload-image', UploadUserImageController::class)
+                ->middleware(['throttle:3,15']);
+            Route::delete('/delete-image', DeleteUserImageController::class)
+                ->middleware(['throttle:3,15']);
+            Route::put('/update-password', UpdateUserPasswordController::class)
+                ->middleware(['throttle:1,1440']);
+            Route::put('/update-email', UpdateUserEmailController::class)
+                ->middleware(['throttle:1,1440']);
             Route::delete('/', DeleteUserController::class);
         });
 
         Route::group(['prefix' => 'posts'], function () {
             Route::post('/', StorePostController::class)
-                ->middleware(['throttle:6,60']);
+                /*->middleware(['throttle:6,15'])*/;
             Route::put('/{post}', UpdatePostController::class)
-                ->can('update', 'post');
+                ->can('update', 'post')
+                ->middleware(['throttle:6,15']);
             Route::delete('/{post}', DeletePostController::class)
                 ->can('delete', 'post')
-                ->middleware(['throttle:10,60']);
+                ->middleware(['throttle:10,15']);
         });
     });
 });
