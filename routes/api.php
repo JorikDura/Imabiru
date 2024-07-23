@@ -59,7 +59,7 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::group(['prefix' => 'posts'], function () {
             Route::post('/', StorePostController::class)
-                /*->middleware(['throttle:6,15'])*/;
+                ->middleware(['throttle:6,15']);
             Route::put('/{post}', UpdatePostController::class)
                 ->can('update', 'post')
                 ->middleware(['throttle:6,15']);
