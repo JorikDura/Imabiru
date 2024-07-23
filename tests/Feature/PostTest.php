@@ -201,4 +201,16 @@ describe('testing posts', function () {
             ]
         );
     });
+
+    it('try to delete someone else\'s comment', function () {
+        /** @var Comment $comment */
+        $comment = Comment::factory()->create([
+            'commentable_id' => $this->post->id,
+            'commentable_type' => Post::class
+        ]);
+
+        actingAs($this->user)
+            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/$comment->id")
+            ->assertStatus(403);
+    });
 });

@@ -6,6 +6,7 @@ namespace App\Actions\Comment;
 
 use App\Actions\Image\DeleteImageAction;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Gate;
 
 final readonly class DeleteCommentAction
 {
@@ -24,6 +25,8 @@ final readonly class DeleteCommentAction
             'commentable_id' => $commentableId,
             'commentable_type' => $commentableType
         ])->firstOrFail();
+
+        Gate::authorize('delete', $comment);
 
         $images = $comment->images()->get();
 

@@ -119,6 +119,18 @@ describe('users test', function () {
             ]
         );
     });
+
+    it('try to delete someone else\'s comment', function () {
+        /** @var Comment $comment */
+        $comment = Comment::factory()->create([
+            'commentable_id' => $this->user->id,
+            'commentable_type' => User::class
+        ]);
+
+        actingAs($this->user)
+            ->deleteJson("/api/v1/users/{$this->user->id}/comments/$comment->id")
+            ->assertStatus(403);
+    });
 });
 
 function getUploadedFile(): UploadedFile
