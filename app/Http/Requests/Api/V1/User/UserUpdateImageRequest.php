@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace app\Http\Requests\Api\V1\Image;
+namespace App\Http\Requests\Api\V1\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ImageRequest extends FormRequest
+class UserUpdateImageRequest extends FormRequest
 {
     public function rules(): array
     {

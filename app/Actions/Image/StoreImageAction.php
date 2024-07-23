@@ -10,7 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image as ImageFacade;
 
-final readonly class UploadImageAction
+final readonly class StoreImageAction
 {
     private const int MIN_IMAGE_HEIGHT = 400;
 

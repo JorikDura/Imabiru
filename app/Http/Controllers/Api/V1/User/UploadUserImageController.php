@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\User;
 
-use App\Actions\Image\UploadImageAction;
+use App\Actions\Image\StoreImageAction;
 use App\Enums\ImagePath;
 use App\Http\Controllers\Controller;
-use app\Http\Requests\Api\V1\Image\ImageRequest;
+use App\Http\Requests\Api\V1\User\UserUpdateImageRequest;
 use App\Http\Resources\Api\V1\Image\ImageResource;
 use App\Models\User;
 
 class UploadUserImageController extends Controller
 {
     public function __invoke(
-        ImageRequest $request,
-        UploadImageAction $action
+        UserUpdateImageRequest $request,
+        StoreImageAction $action
     ) {
         /** @var User $user */
         $user = auth()->user();

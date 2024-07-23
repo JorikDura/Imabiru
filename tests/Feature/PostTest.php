@@ -1,12 +1,14 @@
 <?php
 
 use App\Enums\TokenAbility;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\get;
 use function Pest\Laravel\postJson;
@@ -14,6 +16,7 @@ use function Pest\Laravel\postJson;
 describe('testing posts', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
+        $this->post = Post::factory()->create();
     });
 
     it('get all posts', function () {
@@ -130,16 +133,72 @@ describe('testing posts', function () {
             ->delete("/api/v1/posts/{$testResult->original->id}")
             ->assertStatus(200);
     });
-});
 
-/**
- * @return UploadedFile
- */
-function getUploadedFile(): UploadedFile
-{
-    return new UploadedFile(
-        path: resource_path(path: 'test-files/test_file.jpg'),
-        originalName: 'test_file.jpg',
-        test: true
-    );
-}
+    it('get comments', function () {
+        Comment::factory(5)->create([
+            'commentable_id' => $this->post->id,
+            'commentable_type' => Post::class
+        ]);
+
+        get("api/v1/posts/{$this->post->id}/comments")
+            ->assertStatus(200);
+    });
+
+    it('get comment by id', function () {
+        /** @var Comment $comment */
+        $comment = Comment::factory()->create([
+            'commentable_id' => $this->post->id,
+            'commentable_type' => Post::class,
+            'text' => 'test comment!'
+        ]);
+
+        get("api/v1/posts/{$this->post->id}/comments/$comment->id")
+            ->assertStatus(200)
+            ->assertSee('test comment!');
+    });
+
+    it('add && delete comment', function () {
+        $comment = actingAs($this->user)
+            ->postJson(
+                uri: "api/v1/posts/{$this->post->id}/comments",
+                data: [
+                    'text' => 'testing!',
+                    'images' => [getUploadedFile()]
+                ]
+            )->assertStatus(201);
+
+        assertDatabaseHas(
+            table: 'comments',
+            data: [
+                'text' => 'testing!',
+            ]
+        );
+
+        assertDatabaseHas(
+            table: 'images',
+            data: [
+                'imageable_id' => $comment->original->id,
+                'imageable_type' => Comment::class
+            ]
+        );
+
+        actingAs($this->user)
+            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/{$comment->original->id}")
+            ->assertStatus(200);
+
+        assertDatabaseMissing(
+            table: 'comments',
+            data: [
+                'text' => 'testing!',
+            ]
+        );
+
+        assertDatabaseMissing(
+            table: 'images',
+            data: [
+                'imageable_id' => $comment->original->id,
+                'imageable_type' => Comment::class
+            ]
+        );
+    });
+});

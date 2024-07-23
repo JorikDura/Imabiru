@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Post;
 
-use App\Actions\Image\UploadImageAction;
+use App\Actions\Image\StoreImageAction;
 use App\Enums\ImagePath;
 use App\Http\Requests\Api\V1\Posts\StorePostRequest;
 use App\Models\Post;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 final readonly class StorePostAction
 {
     public function __construct(
-        private uploadImageAction $uploadImageAction,
+        private StoreImageAction $uploadImageAction,
     ) {
     }
 
