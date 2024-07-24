@@ -1,4 +1,4 @@
-```Imabiru``` - imageboard на Laravel.
+```Imabiru``` - imageboard на Laravel. Сделан просто так.
 
 Используемые зависимости:
 
@@ -155,6 +155,8 @@ GET api/v1/users
     ]
 }
 ```
+
+Допишу потом...
 
 ## Posts
 
