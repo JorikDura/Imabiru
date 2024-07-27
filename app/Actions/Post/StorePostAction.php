@@ -31,7 +31,6 @@ final readonly class StorePostAction
                 ->map(function ($tag) {
                     return Tag::firstOrCreate(['name' => $tag])->id;
                 });
-            ;
 
             $post->tags()->attach($tagIds);
 
