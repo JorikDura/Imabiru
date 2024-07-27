@@ -4,15 +4,29 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Post;
 
+use App\Filters\Api\V1\Post\OrderByDateFilter;
+use App\Filters\Api\V1\Post\TagFilter;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Posts\PostIndexRequest;
 use App\Http\Resources\Api\V1\Post\PostResource;
 use App\Models\Post;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Pipeline;
 
 class IndexController extends Controller
 {
-    public function __invoke()
+    public function __invoke(PostIndexRequest $request)
     {
-        $post = Post::with(['images', 'tags'])
+        /** @var Builder $postQuery */
+        $postQuery = Pipeline::send(Post::query())
+            ->through([
+                TagFilter::class,
+                OrderByDateFilter::class
+            ])
+            ->thenReturn();
+
+        $post = $postQuery
+            ->with(['images', 'tags'])
             ->paginate();
 
         return PostResource::collection($post);

@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V1\Posts\StorePostRequest;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Support\Facades\DB;
+use Str;
 
 final readonly class StorePostAction
 {
@@ -29,7 +30,7 @@ final readonly class StorePostAction
 
             $tagIds = collect($request->validated('tags'))
                 ->map(function ($tag) {
-                    return Tag::firstOrCreate(['name' => $tag])->id;
+                    return Tag::firstOrCreate(['name' => Str::lower($tag)])->id;
                 });
 
             $post->tags()->attach($tagIds);

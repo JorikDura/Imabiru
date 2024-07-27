@@ -19,4 +19,11 @@ class StorePostRequest extends FormRequest
             'images.*' => ['bail', 'image', 'mimes:jpeg,jpg,png', 'max:10240'],
         ];
     }
+
+    protected function passedValidation(): void
+    {
+        $this->replace([
+            'tags' => collect($this->validated('tags'))->map(fn ($tag) => mb_strtolower($tag))->toArray()
+        ]);
+    }
 }
