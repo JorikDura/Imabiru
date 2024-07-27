@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 use App\Models\Comment;
 use App\Models\User;
-
 use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
 describe('users test', function () {
     beforeEach(function () {
@@ -18,18 +17,18 @@ describe('users test', function () {
     });
 
     it('get users', function () {
-        get('/api/v1/users/')
-            ->assertStatus(200);
+        getJson('/api/v1/users/')
+            ->assertSuccessful();
     });
 
     it('get user fail', function () {
-        get('/api/v1/users/1')
+        getJson('/api/v1/users/1')
             ->assertStatus(404);
     });
 
     it('get user', function () {
-        get("/api/v1/users/{$this->user->id}")
-            ->assertStatus(200);
+        getJson("/api/v1/users/{$this->user->id}")
+            ->assertSuccessful();
     });
 
     it('upload && delete image', function () {
@@ -39,17 +38,17 @@ describe('users test', function () {
                 data: [
                     'image' => getUploadedFile()
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         actingAs($this->user)
-            ->delete('api/v1/users/delete-image')
-            ->assertStatus(200);
+            ->deleteJson('api/v1/users/delete-image')
+            ->assertSuccessful();
     });
 
     it('delete user', function () {
         actingAs($this->user)
-            ->delete('/api/v1/users/')
-            ->assertStatus(200);
+            ->deleteJson('/api/v1/users/')
+            ->assertSuccessful();
     });
 
     it('get comments', function () {
@@ -58,8 +57,8 @@ describe('users test', function () {
             'commentable_type' => User::class,
         ]);
 
-        get("/api/v1/users/{$this->user->id}/comments")
-            ->assertStatus(200);
+        getJson("/api/v1/users/{$this->user->id}/comments")
+            ->assertSuccessful();
     });
 
     it('get comment by id', function () {
@@ -70,8 +69,8 @@ describe('users test', function () {
             'text' => 'testing user comment!'
         ]);
 
-        get("/api/v1/users/{$this->user->id}/comments/$comment->id")
-            ->assertStatus(200)
+        getJson("/api/v1/users/{$this->user->id}/comments/$comment->id")
+            ->assertSuccessful()
             ->assertSee('testing user comment!');
     });
 
@@ -83,7 +82,7 @@ describe('users test', function () {
                     'text' => 'testing user comment!',
                     'images' => [getUploadedFile()]
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         assertDatabaseHas(
             table: 'comments',
@@ -102,7 +101,7 @@ describe('users test', function () {
 
         actingAs($this->user)
             ->deleteJson("/api/v1/users/{$this->user->id}/comments/{$comment->original->id}")
-            ->assertStatus(200);
+            ->assertSuccessful();
 
         assertDatabaseMissing(
             table: 'comments',
@@ -129,7 +128,7 @@ describe('users test', function () {
 
         actingAs($this->user)
             ->deleteJson("/api/v1/users/{$this->user->id}/comments/$comment->id")
-            ->assertStatus(403);
+            ->assertForbidden();
     });
 });
 

@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1\User;
+namespace App\Http\Controllers\Api\V1\Post\Comment;
 
 use App\Actions\Comment\DeleteCommentAction;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Post;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeleteUserCommentController extends Controller
+class DeleteController extends Controller
 {
     public function __invoke(
-        int $userId,
+        int $postId,
         int $commentId,
         DeleteCommentAction $action
-    ) {
+    ): Response {
         $action(
             commentId: $commentId,
-            commentableId: $userId,
-            commentableType: User::class,
+            commentableId: $postId,
+            commentableType: Post::class,
         );
 
         return response()->noContent(Response::HTTP_OK);

@@ -8,6 +8,7 @@ use App\Actions\Auth\CreateTokenAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Symfony\Component\HttpFoundation\Response;
 
 class RegisterController extends Controller
@@ -18,6 +19,8 @@ class RegisterController extends Controller
 
         /** @var array{token: string, refreshToken: string} $tokens */
         $tokens = $action($user);
+
+        event(new Registered($user));
 
         return response()->json(
             data: [

@@ -8,7 +8,7 @@ use App\Actions\Image\DeleteImageAction;
 use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeleteUserController extends Controller
+class DeleteController extends Controller
 {
     public function __invoke(DeleteImageAction $action)
     {

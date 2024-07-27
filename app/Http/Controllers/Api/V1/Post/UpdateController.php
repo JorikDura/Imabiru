@@ -10,7 +10,7 @@ use App\Http\Requests\Api\V1\Posts\UpdatePostRequest;
 use App\Http\Resources\Api\V1\Post\PostResource;
 use App\Models\Post;
 
-class UpdatePostController extends Controller
+class UpdateController extends Controller
 {
     public function __invoke(
         UpdatePostRequest $request,

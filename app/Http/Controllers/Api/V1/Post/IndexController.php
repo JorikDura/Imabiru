@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\Post\PostResource;
 use App\Models\Post;
 
-class IndexPostController extends Controller
+class IndexController extends Controller
 {
     public function __invoke()
     {

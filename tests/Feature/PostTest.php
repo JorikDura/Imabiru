@@ -10,7 +10,7 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 describe('testing posts', function () {
@@ -20,13 +20,13 @@ describe('testing posts', function () {
     });
 
     it('get all posts', function () {
-        get('api/v1/posts')
-            ->assertStatus(200);
+        getJson('api/v1/posts')
+            ->assertSuccessful();
     });
 
     it('add post && get it && delete it', function () {
         $testResult = actingAs($this->user)
-            ->post(
+            ->postJson(
                 uri: 'api/v1/posts',
                 data: [
                     'title' => 'test',
@@ -38,7 +38,7 @@ describe('testing posts', function () {
                         getUploadedFile()
                     ]
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         assertDatabaseHas(
             table: 'posts',
@@ -49,19 +49,19 @@ describe('testing posts', function () {
             ]
         );
 
-        get("api/v1/posts/{$testResult->original->id}")
-            ->assertStatus(200)
+        getJson("api/v1/posts/{$testResult->original->id}")
+            ->assertSuccessful()
             ->assertSee('test');
 
         actingAs($this->user)
             ->delete("/api/v1/posts/{$testResult->original->id}")
-            ->assertStatus(200);
+            ->assertSuccessful();
     });
 
 
     it("update post", function () {
         $testResult = actingAs($this->user)
-            ->post(
+            ->postJson(
                 uri: 'api/v1/posts',
                 data: [
                     'title' => 'another test',
@@ -73,7 +73,7 @@ describe('testing posts', function () {
                         getUploadedFile()
                     ]
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         actingAs($this->user)
             ->postJson(
@@ -86,17 +86,17 @@ describe('testing posts', function () {
                     ],
                     'description' => 'still testing!'
                 ]
-            )->assertStatus(200);
+            )->assertSuccessful();
 
         //delete image from storage
         actingAs($this->user)
-            ->delete("/api/v1/posts/{$testResult->original->id}")
-            ->assertStatus(200);
+            ->deleteJson("/api/v1/posts/{$testResult->original->id}")
+            ->assertSuccessful();
     });
 
     it("try to update && delete someone else's post", function () {
         $testResult = actingAs($this->user)
-            ->post(
+            ->postJson(
                 uri: 'api/v1/posts',
                 data: [
                     'title' => 'test',
@@ -108,7 +108,7 @@ describe('testing posts', function () {
                         getUploadedFile()
                     ]
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         Sanctum::actingAs(
             user: User::factory()->create(),
@@ -122,16 +122,16 @@ describe('testing posts', function () {
                 'title' => 'test',
                 'description' => 'still testing!'
             ]
-        )->assertStatus(403);
+        )->assertForbidden();
 
         deleteJson(
             uri: "api/v1/posts/{$testResult->original->id}"
-        )->assertStatus(403);
+        )->assertForbidden();
 
         //delete image from storage
         actingAs($this->user)
-            ->delete("/api/v1/posts/{$testResult->original->id}")
-            ->assertStatus(200);
+            ->deleteJson("/api/v1/posts/{$testResult->original->id}")
+            ->assertSuccessful();
     });
 
     it('get comments', function () {
@@ -140,8 +140,8 @@ describe('testing posts', function () {
             'commentable_type' => Post::class
         ]);
 
-        get("api/v1/posts/{$this->post->id}/comments")
-            ->assertStatus(200);
+        getJson("api/v1/posts/{$this->post->id}/comments")
+            ->assertSuccessful();
     });
 
     it('get comment by id', function () {
@@ -152,8 +152,8 @@ describe('testing posts', function () {
             'text' => 'test comment!'
         ]);
 
-        get("api/v1/posts/{$this->post->id}/comments/$comment->id")
-            ->assertStatus(200)
+        getJson("api/v1/posts/{$this->post->id}/comments/$comment->id")
+            ->assertSuccessful()
             ->assertSee('test comment!');
     });
 
@@ -165,7 +165,7 @@ describe('testing posts', function () {
                     'text' => 'testing!',
                     'images' => [getUploadedFile()]
                 ]
-            )->assertStatus(201);
+            )->assertSuccessful();
 
         assertDatabaseHas(
             table: 'comments',
@@ -184,7 +184,7 @@ describe('testing posts', function () {
 
         actingAs($this->user)
             ->deleteJson("/api/v1/posts/{$this->post->id}/comments/{$comment->original->id}")
-            ->assertStatus(200);
+            ->assertSuccessful();
 
         assertDatabaseMissing(
             table: 'comments',
@@ -211,6 +211,6 @@ describe('testing posts', function () {
 
         actingAs($this->user)
             ->deleteJson("/api/v1/posts/{$this->post->id}/comments/$comment->id")
-            ->assertStatus(403);
+            ->assertForbidden();
     });
 });

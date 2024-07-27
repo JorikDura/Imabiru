@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\User\UpdateUserPasswordRequest;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateUserPasswordController extends Controller
+class UpdatePasswordController extends Controller
 {
     /**
      * @throws \Exception

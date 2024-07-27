@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeletePostController extends Controller
+class DeleteController extends Controller
 {
     public function __invoke(Post $post, DeletePostAction $action)
     {

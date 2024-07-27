@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\User\UserResource;
 use App\Models\User;
 
-class IndexUserController extends Controller
+class IndexController extends Controller
 {
     public function __invoke()
     {

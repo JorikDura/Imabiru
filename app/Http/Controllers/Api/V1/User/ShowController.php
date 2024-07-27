@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\User\UserResource;
 use App\Models\User;
 
-class ShowUserController extends Controller
+class ShowController extends Controller
 {
     public function __invoke(int $id)
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1\User;
+namespace App\Http\Controllers\Api\V1\User\Image;
 
 use App\Actions\Image\StoreImageAction;
 use App\Enums\ImagePath;
@@ -11,12 +11,13 @@ use App\Http\Requests\Api\V1\User\UserUpdateImageRequest;
 use App\Http\Resources\Api\V1\Image\ImageResource;
 use App\Models\User;
 
-class UploadUserImageController extends Controller
+class UploadController extends Controller
 {
     public function __invoke(
         UserUpdateImageRequest $request,
         StoreImageAction $action
     ) {
+        $request->getPreferredLanguage();
         /** @var User $user */
         $user = auth()->user();
 

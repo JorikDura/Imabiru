@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1\User;
+namespace App\Http\Controllers\Api\V1\User\Comment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\Comment\CommentResource;
 use App\Models\User;
 
-class IndexUserCommentController extends Controller
+class IndexController extends Controller
 {
     public function __invoke(User $user)
     {
