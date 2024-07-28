@@ -43,9 +43,7 @@ final readonly class UpdatePostAction
                     ->whereIn(column: 'id', values: $imagesIds)
                     ->get();
 
-                $dbImages->each(function (Image $image) {
-                    $image->delete();
-                });
+                $dbImages->each(fn(Image $image) => $image->delete());
             });
 
             $request->whenHas('images', function (array $images) use ($post) {
