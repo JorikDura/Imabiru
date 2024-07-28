@@ -7,14 +7,14 @@ namespace App\Http\Controllers\Api\V1\User\Image;
 use App\Actions\Image\StoreImageAction;
 use App\Enums\ImagePath;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\User\UserUpdateImageRequest;
+use App\Http\Requests\Api\V1\User\UpdateUserImageRequest;
 use App\Http\Resources\Api\V1\Image\ImageResource;
 use App\Models\User;
 
 class UploadController extends Controller
 {
     public function __invoke(
-        UserUpdateImageRequest $request,
+        UpdateUserImageRequest $request,
         StoreImageAction $action
     ) {
         $request->getPreferredLanguage();

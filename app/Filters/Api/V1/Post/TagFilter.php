@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filters\Api\V1\Post;
 
-use App\Http\Requests\Api\V1\Posts\PostIndexRequest;
+use App\Http\Requests\Api\V1\Posts\IndexPostRequest;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 
 final readonly class TagFilter
 {
     public function __construct(
-        private PostIndexRequest $request
+        private IndexPostRequest $request
     ) {
     }
 

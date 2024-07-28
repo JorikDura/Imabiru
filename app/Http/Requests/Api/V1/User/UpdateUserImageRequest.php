@@ -6,7 +6,7 @@ namespace App\Http\Requests\Api\V1\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserUpdateImageRequest extends FormRequest
+class UpdateUserImageRequest extends FormRequest
 {
     public function rules(): array
     {

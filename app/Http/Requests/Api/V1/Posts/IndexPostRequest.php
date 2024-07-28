@@ -6,7 +6,7 @@ namespace App\Http\Requests\Api\V1\Posts;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostIndexRequest extends FormRequest
+class IndexPostRequest extends FormRequest
 {
     public function rules(): array
     {
