@@ -15,7 +15,7 @@ final readonly class DeletePostAction
         DB::transaction(function () use ($post) {
             $images = $post->images()->get();
 
-            $images->each(fn(Image $image) => $image->delete());
+            $images->each(fn (Image $image) => $image->delete());
 
             $post->delete();
         });
