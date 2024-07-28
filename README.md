@@ -26,6 +26,8 @@ POST api/v1/auth/register
 
 Регистрирует пользователя.
 
+После регистрации необходимо подтвердить почту.
+
 Принимает:
 * name — имя, мин. 6, макс, 48, уникальное, обязательно
 * email — почта, уникальное, обязательно
@@ -129,7 +131,9 @@ PUT api/v1/users/update-password
 Статус 200 (OK)
 
 
-### Users
+## Users
+
+### Get users
 
 ```
 GET api/v1/users
@@ -139,6 +143,7 @@ GET api/v1/users
 
 Принимает:
 * page - номер страницы, необязательно.
+* search - поиск по имени пользователя, необязательно, строка, мин 4. макс. 48
 
 Возвращает:
 
@@ -146,18 +151,73 @@ GET api/v1/users
 {
     "data": [
         {
-            "id": 41,
+            "id": 1,
             "name": "Крутой сигма",
-            "email": "vip.sigma@shock.com",
-            "image": null,
-            "created_at": "2024-07-23T21:30:58.000000Z"
+            "image": {
+                "id": 1,
+                "imageName": "http://localhost/storage/images/users/user-1-1722177061.jpg",
+                "imageNameScaled": "http://localhost/storage/images/users/user-1-1722177061-scaled.jpg"
+            }
         }
     ]
 }
 ```
 
-Допишу потом...
+### Get user by id
+
+```
+GET api/v1/users/{id}
+```
+
+Где id - id пользователя
+
+Получение конкретного пользователя
+
+Возвращает:
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Крутой сигма",
+        "email": "vipshockshock@gmail.com",
+        "image": {
+            "id": 1,
+            "imageName": "http://localhost/storage/images/users/user-1-1722177061.jpg",
+            "imageNameScaled": "http://localhost/storage/images/users/user-1-1722177061-scaled.jpg"
+        },
+        "created_at": "2024-07-28T14:29:04.000000Z"
+    }
+}
+```
+
+### Upload user image
+
+```
+POST api/v1/users/upload-image
+```
+Обновляет фотографию пользователя
+
+Возвращает:
+```json
+{
+    "data": {
+        "id": 9,
+        "imageName": "http://localhost/storage/images/users/user-1-1722178176.jpg",
+        "imageNameScaled": "http://localhost/storage/images/users/user-1-1722178176-scaled.jpg"
+    }
+}
+```
+
+### Delete user image
+
+```
+DELETE api/v1/users/delete-image
+```
+
+Удаляет фотографию пользователя
+
 
 ## Posts
 
-###
+### Как-нибудь потом...
