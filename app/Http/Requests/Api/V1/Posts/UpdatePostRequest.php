@@ -13,8 +13,8 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => ['bail', 'required', 'string', 'min:3', 'max:48'],
             'description' => ['bail', 'nullable', 'string', 'max:255'],
-            'tags' => ['bail', 'required', 'array'],
-            'tags.*' => ['bail', 'required', 'string', 'min:1', 'max:12'],
+            'tags' => ['bail', 'required', 'array', 'min:1', 'max:12'],
+            'tags.*' => ['bail', 'required', 'string', 'min:3', 'max:24'],
             'images' => ['bail', 'nullable', 'array', 'max:8'],
             'images.*' => ['bail', 'image', 'mimes:jpeg,jpg,png', 'max:10240'],
             'removeImagesIds' => ['bail', 'nullable', 'array'],
