@@ -31,6 +31,6 @@ class VerifyEmailController extends Controller
             event(new Verified($user));
         }
 
-        return 'Все хорошо';
+        return view('email-verification');
     }
 }
