@@ -15,13 +15,15 @@ class UploadController extends Controller
 {
     public function __invoke(
         UpdateUserImageRequest $request,
-        StoreImageAction $action
+        StoreImageAction $storeAction
     ) {
         $request->getPreferredLanguage();
         /** @var User $user */
         $user = auth()->user();
 
-        $image = $action(
+        $user->image()->first()?->delete();
+
+        $image = $storeAction(
             image: $request->validated('image'),
             path: ImagePath::UserPath,
             name: 'user-'.$user->id,

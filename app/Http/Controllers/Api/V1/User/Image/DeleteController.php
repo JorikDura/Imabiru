@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\User\Image;
 
-use App\Actions\Image\DeleteImageAction;
 use App\Http\Controllers\Controller;
-use App\Models\Image;
+use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends Controller
 {
-    public function __invoke(DeleteImageAction $action)
+    public function __invoke()
     {
-        /** @var Image $image */
-        $image = auth()
-            ->user()
-            ->image()
-            ->firstOrFail();
+        /** @var User $user */
+        $user = auth()->user();
 
-        $action($image);
+        $user->image()
+            ->firstOrFail()
+            ->delete();
 
         return response()->noContent(Response::HTTP_OK);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions\Post;
 
-use App\Actions\Image\DeleteImageAction;
 use App\Actions\Image\StoreImageAction;
 use App\Enums\ImagePath;
 use App\Http\Requests\Api\V1\Posts\UpdatePostRequest;
@@ -17,8 +16,7 @@ use Nette\Schema\ValidationException;
 final readonly class UpdatePostAction
 {
     public function __construct(
-        private StoreImageAction $uploadImageAction,
-        private DeleteImageAction $deleteImageAction,
+        private StoreImageAction $uploadImageAction
     ) {
     }
 
@@ -46,7 +44,7 @@ final readonly class UpdatePostAction
                     ->get();
 
                 $dbImages->each(function (Image $image) {
-                    $this->deleteImageAction->__invoke($image);
+                    $image->delete();
                 });
             });
 

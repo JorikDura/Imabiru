@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace App\Actions\Comment;
 
-use App\Actions\Image\DeleteImageAction;
 use App\Models\Comment;
+use App\Models\Image;
 use Illuminate\Support\Facades\Gate;
 
 final readonly class DeleteCommentAction
 {
-    public function __construct(
-        private DeleteImageAction $deleteImageAction
-    ) {
-    }
-
     public function __invoke(
         int $commentId,
         int $commentableId,
@@ -30,8 +25,8 @@ final readonly class DeleteCommentAction
 
         $images = $comment->images()->get();
 
-        $images->each(function ($image) {
-            $this->deleteImageAction->__invoke($image);
+        $images->each(function (Image $image) {
+            $image->delete();
         });
 
         $comment->delete();
