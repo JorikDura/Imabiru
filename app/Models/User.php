@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Notifications\VerifyEmailQueueable;
+use App\Notifications\VerifyEmailByCode;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -53,7 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmailQueueable());
+        $this->notify(new VerifyEmailByCode());
     }
 
     public function isAdmin(): bool

@@ -2,7 +2,7 @@
 
 use App\Enums\TokenAbility;
 use App\Models\User;
-use App\Notifications\VerifyEmailQueueable;
+use App\Notifications\VerifyEmailByCode;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\postJson;
@@ -49,7 +49,9 @@ describe('auth test', function () {
     it('send email notification', function () {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'email_verified_at' => null
+        ]);
 
         Sanctum::actingAs(
             user: $user,
@@ -59,6 +61,6 @@ describe('auth test', function () {
         postJson(route('verification.send'))
             ->assertSuccessful();
 
-        Notification::assertSentTo($user, VerifyEmailQueueable::class);
+        Notification::assertSentTo($user, VerifyEmailByCode::class);
     });
 });
