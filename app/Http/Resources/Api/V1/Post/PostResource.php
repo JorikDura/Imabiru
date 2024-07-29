@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources\Api\V1\Post;
 
 use App\Http\Resources\Api\V1\Image\ImageResource;
-use App\Http\Resources\Api\V1\TagResource;
+use App\Http\Resources\Api\V1\Tag\TagResource;
 use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
