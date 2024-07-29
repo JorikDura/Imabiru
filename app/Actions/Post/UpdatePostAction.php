@@ -44,7 +44,7 @@ final readonly class UpdatePostAction
 
                 $dbImages = $imageQuery->get();
 
-                $dbImages->each(fn(Image $image) => $image->deleteImages());
+                $dbImages->each(fn (Image $image) => $image->deleteImages());
 
                 $imageQuery->delete();
             });

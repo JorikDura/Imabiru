@@ -27,7 +27,7 @@ final readonly class DeleteCommentAction
 
         $images = $imageQuery->get();
 
-        $images->each(fn(Image $image) => $image->deleteImages());
+        $images->each(fn (Image $image) => $image->deleteImages());
 
         $imageQuery->delete();
 
