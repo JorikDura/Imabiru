@@ -26,12 +26,17 @@ class Image extends Model
 
     public function delete(): ?bool
     {
+        $this->deleteImages();
+
+        return parent::delete();
+    }
+
+    public function deleteImages(): void
+    {
         Storage::delete("public/$this->image_name");
 
         if (!is_null($this->image_name_scaled)) {
             Storage::delete("public/$this->image_name_scaled");
         }
-
-        return parent::delete();
     }
 }

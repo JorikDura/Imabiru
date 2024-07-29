@@ -39,11 +39,14 @@ final readonly class UpdatePostAction
             $post->tags()->sync($tagIds);
 
             $request->whenHas('removeImagesIds', function (array $imagesIds) use ($post) {
-                $dbImages = $post->images()
-                    ->whereIn(column: 'id', values: $imagesIds)
-                    ->get();
+                $imageQuery = $post->images()
+                    ->whereIn(column: 'id', values: $imagesIds);
 
-                $dbImages->each(fn (Image $image) => $image->delete());
+                $dbImages = $imageQuery->get();
+
+                $dbImages->each(fn(Image $image) => $image->deleteImages());
+
+                $imageQuery->delete();
             });
 
             $request->whenHas('images', function (array $images) use ($post) {

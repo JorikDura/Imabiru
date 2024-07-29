@@ -23,9 +23,13 @@ final readonly class DeleteCommentAction
 
         Gate::authorize('delete', $comment);
 
-        $images = $comment->images()->get();
+        $imageQuery = $comment->images();
 
-        $images->each(fn (Image $image) => $image->delete());
+        $images = $imageQuery->get();
+
+        $images->each(fn(Image $image) => $image->deleteImages());
+
+        $imageQuery->delete();
 
         $comment->delete();
     }
