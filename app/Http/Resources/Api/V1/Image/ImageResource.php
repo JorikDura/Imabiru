@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property int $id
  * @property string $image_name
- * @property string $image_name_scaled
+ * @property ?string $image_name_scaled
  */
 class ImageResource extends JsonResource
 {
@@ -19,7 +19,10 @@ class ImageResource extends JsonResource
         return [
             'id' => $this->id,
             'imageName' => asset("storage/$this->image_name"),
-            'imageNameScaled' => asset("storage/$this->image_name_scaled"),
+            'imageNameScaled' => match ($this->image_name_scaled) {
+                null => asset("storage/$this->image_name"),
+                default => asset("storage/$this->image_name_scaled")
+            },
         ];
     }
 }
