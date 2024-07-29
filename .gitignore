@@ -22,3 +22,5 @@ yarn-error.log
 /caddy
 frankenphp
 frankenphp-worker.php
+/config/caddy
+/data/caddy
