@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Comment;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
+use Tests\TestHelpers;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -32,17 +32,27 @@ describe('users test', function () {
     });
 
     it('upload && delete image', function () {
-        actingAs($this->user)
+        $testResult = actingAs($this->user)
             ->postJson(
                 uri: 'api/v1/users/upload-image',
                 data: [
-                    'image' => getUploadedFile()
+                    'image' => TestHelpers::uploadFile('test_1.jpg')
                 ]
             )->assertSuccessful();
+
+        Storage::disk('public')->assertExists([
+            $testResult->original->image_name,
+            $testResult->original->image_name_scaled
+        ]);
 
         actingAs($this->user)
             ->deleteJson('api/v1/users/delete-image')
             ->assertSuccessful();
+
+        Storage::disk('public')->assertMissing([
+            $testResult->original->image_name,
+            $testResult->original->image_name_scaled
+        ]);
     });
 
     it('delete user', function () {
@@ -80,7 +90,7 @@ describe('users test', function () {
                 uri: "api/v1/users/{$this->user->id}/comments",
                 data: [
                     'text' => 'testing user comment!',
-                    'images' => [getUploadedFile()]
+                    'images' => TestHelpers::randomUploadedFiles()
                 ]
             )->assertSuccessful();
 
@@ -131,12 +141,3 @@ describe('users test', function () {
             ->assertForbidden();
     });
 });
-
-function getUploadedFile(): UploadedFile
-{
-    return new UploadedFile(
-        path: resource_path(path: 'test-files/test_file.jpg'),
-        originalName: 'test_file.jpg',
-        test: true
-    );
-}

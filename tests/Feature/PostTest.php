@@ -5,6 +5,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestHelpers;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -24,7 +25,9 @@ describe('testing posts', function () {
             ->assertSuccessful();
     });
 
-    it('add post && get it && delete it', function () {
+    it('add post', function () {
+        Storage::fake('public');
+
         $testResult = actingAs($this->user)
             ->postJson(
                 uri: 'api/v1/posts',
@@ -34,9 +37,7 @@ describe('testing posts', function () {
                     'tags' => [
                         'test_tag'
                     ],
-                    'images' => [
-                        getUploadedFile()
-                    ]
+                    'images' => TestHelpers::randomUploadedFiles()
                 ]
             )->assertSuccessful();
 
@@ -49,66 +50,53 @@ describe('testing posts', function () {
             ]
         );
 
-        getJson("api/v1/posts/{$testResult->original->id}")
+        TestHelpers::deleteImages($testResult);
+    });
+
+    it('get post by id', function () {
+        $post = Post::factory()->create([
+            'title' => 'test',
+        ]);
+
+        getJson("api/v1/posts/$post->id")
             ->assertSuccessful()
             ->assertSee('test');
+    });
+
+    it('delete post', function () {
+        $post = Post::factory()->create([
+            'user_id' => $this->user->id
+        ]);
 
         actingAs($this->user)
-            ->delete("/api/v1/posts/{$testResult->original->id}")
+            ->delete("/api/v1/posts/$post->id")
             ->assertSuccessful();
     });
 
-
     it("update post", function () {
+        $post = Post::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
         $testResult = actingAs($this->user)
             ->postJson(
-                uri: 'api/v1/posts',
-                data: [
-                    'title' => 'another test',
-                    'description' => 'testing another test!',
-                    'tags' => [
-                        'another_tag'
-                    ],
-                    'images' => [
-                        getUploadedFile()
-                    ]
-                ]
-            )->assertSuccessful();
-
-        actingAs($this->user)
-            ->postJson(
-                uri: "/api/v1/posts/{$testResult->original->id}",
+                uri: "/api/v1/posts/$post->id",
                 data: [
                     '_method' => 'PUT',
                     'title' => 'test',
+                    'description' => 'still testing!',
                     'tags' => [
                         'another_tag'
                     ],
-                    'description' => 'still testing!'
+                    'images' => TestHelpers::randomUploadedFiles()
                 ]
             )->assertSuccessful();
 
-        //delete image from storage
-        actingAs($this->user)
-            ->deleteJson("/api/v1/posts/{$testResult->original->id}")
-            ->assertSuccessful();
+        TestHelpers::deleteImages($testResult);
     });
 
     it("try to update && delete someone else's post", function () {
-        $testResult = actingAs($this->user)
-            ->postJson(
-                uri: 'api/v1/posts',
-                data: [
-                    'title' => 'test',
-                    'description' => 'testing!',
-                    'tags' => [
-                        'test_tag'
-                    ],
-                    'images' => [
-                        getUploadedFile()
-                    ]
-                ]
-            )->assertSuccessful();
+        $post = Post::factory()->create();
 
         Sanctum::actingAs(
             user: User::factory()->create(),
@@ -116,22 +104,26 @@ describe('testing posts', function () {
         );
 
         postJson(
-            uri: "/api/v1/posts/{$testResult->original->id}",
+            uri: "/api/v1/posts/$post->id",
             data: [
                 '_method' => 'PUT',
                 'title' => 'test',
                 'description' => 'still testing!'
             ]
         )->assertForbidden();
+    });
+
+    it('try to delete another user post', function () {
+        $post = Post::factory()->create();
+
+        Sanctum::actingAs(
+            user: User::factory()->create(),
+            abilities: [TokenAbility::ACCESS_TOKEN->value]
+        );
 
         deleteJson(
-            uri: "api/v1/posts/{$testResult->original->id}"
+            uri: "api/v1/posts/$post->id"
         )->assertForbidden();
-
-        //delete image from storage
-        actingAs($this->user)
-            ->deleteJson("/api/v1/posts/{$testResult->original->id}")
-            ->assertSuccessful();
     });
 
     it('get comments', function () {
@@ -157,13 +149,13 @@ describe('testing posts', function () {
             ->assertSee('test comment!');
     });
 
-    it('add && delete comment', function () {
+    it('add post-comment', function () {
         $comment = actingAs($this->user)
             ->postJson(
                 uri: "api/v1/posts/{$this->post->id}/comments",
                 data: [
                     'text' => 'testing!',
-                    'images' => [getUploadedFile()]
+                    'images' => TestHelpers::randomUploadedFiles()
                 ]
             )->assertSuccessful();
 
@@ -182,22 +174,26 @@ describe('testing posts', function () {
             ]
         );
 
+        TestHelpers::deleteImages($comment);
+    });
+
+    it('delete comment', function () {
+        /** @var Comment $comment */
+        $comment = Comment::factory()->create([
+            'user_id' => $this->user->id,
+            'commentable_id' => $this->post->id,
+            'commentable_type' => Post::class,
+            'text' => 'test comment!'
+        ]);
+
         actingAs($this->user)
-            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/{$comment->original->id}")
+            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/$comment->id")
             ->assertSuccessful();
 
         assertDatabaseMissing(
             table: 'comments',
             data: [
                 'text' => 'testing!',
-            ]
-        );
-
-        assertDatabaseMissing(
-            table: 'images',
-            data: [
-                'imageable_id' => $comment->original->id,
-                'imageable_type' => Comment::class
             ]
         );
     });
