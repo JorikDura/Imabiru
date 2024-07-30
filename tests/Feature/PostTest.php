@@ -17,12 +17,14 @@ use function Pest\Laravel\postJson;
 describe('testing posts', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->post = Post::factory()->create();
     });
 
     it('get all posts', function () {
+        Post::factory()->create();
+
         getJson('api/v1/posts')
-            ->assertSuccessful();
+            ->assertSuccessful()
+            ->assertSee('likes');
     });
 
     it('add post', function () {
@@ -127,32 +129,38 @@ describe('testing posts', function () {
     });
 
     it('get comments', function () {
+        $post = Post::factory()->create();
+
         Comment::factory(5)->create([
-            'commentable_id' => $this->post->id,
+            'commentable_id' => $post->id,
             'commentable_type' => Post::class
         ]);
 
-        getJson("api/v1/posts/{$this->post->id}/comments")
+        getJson("api/v1/posts/$post->id/comments")
             ->assertSuccessful();
     });
 
     it('get comment by id', function () {
+        $post = Post::factory()->create();
+
         /** @var Comment $comment */
         $comment = Comment::factory()->create([
-            'commentable_id' => $this->post->id,
+            'commentable_id' => $post->id,
             'commentable_type' => Post::class,
             'text' => 'test comment!'
         ]);
 
-        getJson("api/v1/posts/{$this->post->id}/comments/$comment->id")
+        getJson("api/v1/posts/$post->id/comments/$comment->id")
             ->assertSuccessful()
             ->assertSee('test comment!');
     });
 
     it('add post-comment', function () {
+        $post = Post::factory()->create();
+
         $comment = actingAs($this->user)
             ->postJson(
-                uri: "api/v1/posts/{$this->post->id}/comments",
+                uri: "api/v1/posts/$post->id/comments",
                 data: [
                     'text' => 'testing!',
                     'images' => TestHelpers::randomUploadedFiles()
@@ -178,16 +186,17 @@ describe('testing posts', function () {
     });
 
     it('delete comment', function () {
+        $post = Post::factory()->create();
         /** @var Comment $comment */
         $comment = Comment::factory()->create([
             'user_id' => $this->user->id,
-            'commentable_id' => $this->post->id,
+            'commentable_id' => $post->id,
             'commentable_type' => Post::class,
             'text' => 'test comment!'
         ]);
 
         actingAs($this->user)
-            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/$comment->id")
+            ->deleteJson("/api/v1/posts/$post->id/comments/$comment->id")
             ->assertSuccessful();
 
         assertDatabaseMissing(
@@ -199,14 +208,53 @@ describe('testing posts', function () {
     });
 
     it('try to delete someone else\'s comment', function () {
+        $post = Post::factory()->create();
+
         /** @var Comment $comment */
         $comment = Comment::factory()->create([
-            'commentable_id' => $this->post->id,
+            'commentable_id' => $post->id,
             'commentable_type' => Post::class
         ]);
 
         actingAs($this->user)
-            ->deleteJson("/api/v1/posts/{$this->post->id}/comments/$comment->id")
+            ->deleteJson("/api/v1/posts/$post->id/comments/$comment->id")
             ->assertForbidden();
+    });
+
+    it('like a post', function () {
+        $post = Post::factory()->create();
+
+        actingAs($this->user)
+            ->postJson("/api/v1/posts/$post->id/like")
+            ->assertSuccessful()
+            ->assertSee(1);
+    });
+
+    it('try to like a post twice', function () {
+        $post = Post::factory()->create();
+
+        $post->likes()->attach($this->user->id);
+
+        actingAs($this->user)
+            ->postJson("/api/v1/posts/$post->id/like")
+            ->assertConflict();
+    });
+
+    it('dislike a post', function () {
+        $post = Post::factory()->create();
+
+        $post->likes()->attach($this->user->id);
+
+        actingAs($this->user)
+            ->postJson("/api/v1/posts/$post->id/dislike")
+            ->assertSuccessful();
+    });
+
+    it('try to dislike a unliked post', function () {
+        $post = Post::factory()->create();
+
+        actingAs($this->user)
+            ->postJson("/api/v1/posts/$post->id/dislike")
+            ->assertConflict();
     });
 });

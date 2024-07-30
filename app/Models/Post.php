@@ -33,4 +33,9 @@ class Post extends Model
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

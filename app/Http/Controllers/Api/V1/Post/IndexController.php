@@ -27,6 +27,7 @@ class IndexController extends Controller
 
         $post = $postQuery
             ->with(['images', 'tags'])
+            ->withCount('likes')
             ->paginate();
 
         return PostResource::collection($post);

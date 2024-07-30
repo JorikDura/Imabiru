@@ -65,7 +65,11 @@ final readonly class UpdatePostAction
                 });
             });
 
-            return tap($post)->load(['tags', 'images']);
+            return tap($post)
+                ->load([
+                    'tags',
+                    'images'
+                ])->loadCount('likes');
         });
     }
 }

@@ -47,7 +47,10 @@ final readonly class StorePostAction
                 });
             });
 
-            return tap($post)->load(['images', 'tags']);
+            return tap($post)->load([
+                'images',
+                'tags'
+            ])->loadCount('likes');
         });
     }
 }

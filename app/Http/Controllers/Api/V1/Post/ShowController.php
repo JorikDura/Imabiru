@@ -13,6 +13,7 @@ class ShowController extends Controller
     public function __invoke(int $id)
     {
         $post = Post::with(['tags', 'images'])
+            ->withCount('likes')
             ->findOrFail($id);
 
         return PostResource::make($post);
