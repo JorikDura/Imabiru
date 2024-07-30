@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v1/users'], function () {
 
     Route::group(['prefix' => '{user}/comments'], function () {
         Route::get('/', CommentIndexController::class);
+
         Route::get('/{id}', CommentShowController::class);
     });
 

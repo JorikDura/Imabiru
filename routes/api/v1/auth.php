@@ -27,6 +27,7 @@ Route::group(['prefix' => 'v1/auth'], function () {
             Route::post('/verification-notification', SendVerificationNotificationController::class)
                 ->middleware(['throttle:6,1'])
                 ->name('verification.send');
+
             Route::post('/verification-code', VerifyEmailByCodeController::class);
         });
     });
